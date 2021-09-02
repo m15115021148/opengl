@@ -14,7 +14,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-             native-lib
+             nativeGl
 
              # Sets the library as a shared library.
              SHARED
@@ -36,7 +36,7 @@ add_library( # Sets the name of the library.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-                       native-lib
+                       nativeGl
 
                        # Links the target library to the log library
                        # included in the NDK.
