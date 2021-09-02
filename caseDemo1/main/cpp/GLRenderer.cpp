@@ -1,6 +1,3 @@
-//
-// Created by xingkong on 2017/9/21.
-//
 #include "GLRenderer.h"
 
 GLRenderer::GLRenderer() {

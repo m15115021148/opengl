@@ -1,6 +1,3 @@
-//
-// Created by xingkong on 2017/8/10.
-//
 
 #ifndef NATIVEGL_DEMO2_GL_PARAMS_H
 #define NATIVEGL_DEMO2_GL_PARAMS_H

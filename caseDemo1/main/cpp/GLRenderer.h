@@ -1,6 +1,3 @@
-//
-// Created by xingkong on 2017/8/14.
-//
 
 #ifndef NATIVEGL_DEMO2_GLINTERFACE_H
 #define NATIVEGL_DEMO2_GLINTERFACE_H

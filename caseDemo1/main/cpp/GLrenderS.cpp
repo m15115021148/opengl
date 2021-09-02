@@ -1,6 +1,3 @@
-//
-// Created by xingkong on 2017/8/14.
-//
 
 #include "GLrenderS.h"
 

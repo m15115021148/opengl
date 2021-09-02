@@ -1,6 +1,3 @@
-//
-// Created by xingkong on 2017/9/20.
-//
 
 #ifndef NATIVEGL_DEMO2_NATIVE_LIB_H
 #define NATIVEGL_DEMO2_NATIVE_LIB_H
