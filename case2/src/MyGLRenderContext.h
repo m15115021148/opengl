@@ -17,11 +17,12 @@ class MyGLRenderContext
 		void onSurfaceChanged(int width, int height);
 		void onDrawFrame();
 		
-		MyGLRenderContext* GetInstance();
-		void DestroyInstance();
+		static MyGLRenderContext* GetInstance();
+		static void DestroyInstance();
 	
 	private:
-		MyGLRenderContext *m_pContext = nullptr;
+		static MyGLRenderContext *m_pContext;
+		TriangleSample *p_Sample = new TriangleSample();
 };
 
 #endif

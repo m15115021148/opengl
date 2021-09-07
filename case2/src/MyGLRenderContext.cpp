@@ -7,6 +7,7 @@
 #include "GLUtils.h"
 #include "imageDef.h"
 
+MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
 
 MyGLRenderContext::MyGLRenderContext(){
 	
@@ -42,7 +43,7 @@ void MyGLRenderContext::setImageData(int format, int width, int height, uint8_t 
 void MyGLRenderContext::onSurfaceCreated(){
 	LOGD("MyGLRenderContext::OnSurfaceCreated");
     glClearColor(1.0f,1.0f,0.5f, 1.0f);
-    TriangleSample::init();
+    p_Sample->init();
 }
 
 void MyGLRenderContext::onSurfaceChanged(int width, int height){
@@ -54,7 +55,7 @@ void MyGLRenderContext::onDrawFrame(){
 	LOGD("MyGLRenderContext::OnDrawFrame");
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    TriangleSample::draw();
+    p_Sample->draw();
 
 }
 

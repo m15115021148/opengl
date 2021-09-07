@@ -10,16 +10,11 @@
 
 class TriangleSample {
 	public:
-		TriangleSample(){
-			m_ProgramObj = 0;
-			m_VertexShader = 0;
-			m_FragmentShader = 0;
-		}
+		TriangleSample();
 		~TriangleSample();
-
 		
-		static void init();
-		static void draw();
+		void init();
+		void draw();
 	private:
 		GLuint m_ProgramObj;
 		GLuint m_VertexShader;

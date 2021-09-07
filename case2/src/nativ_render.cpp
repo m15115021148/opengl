@@ -1,5 +1,6 @@
 #include "log.h"
 #include "jni.h"
+#include "MyGLRenderContext.h"
 
 #define NATIVE_RENDER_CLASS_NAME "com/romantic/gl/Case2NativeRender"
 
@@ -7,28 +8,33 @@
 extern "C"{
 #endif
 JNIEXPORT void JNICALL init(JNIEnv *env, jclass type){
-
+	MyGLRenderContext::GetInstance();
 }
 
 JNIEXPORT void JNICALL deInit(JNIEnv *env, jclass type){
-	
+	MyGLRenderContext::DestroyInstance();
 }
 
 JNIEXPORT void JNICALL setImageData(JNIEnv *env, jclass type, 
 							jint format, jint width, jint height, jbyteArray imageData){
-	
+	int len = env->GetArrayLength (imageData);
+    uint8_t* buf = new uint8_t[len];
+    env->GetByteArrayRegion(imageData, 0, len, reinterpret_cast<jbyte*>(buf));
+    MyGLRenderContext::GetInstance()->setImageData(format, width, height, buf);
+    delete[] buf;
+    env->DeleteLocalRef(imageData);
 }
 
 JNIEXPORT void JNICALL onSurfaceCreated(JNIEnv *env, jclass type){
-	
+	MyGLRenderContext::GetInstance()->onSurfaceCreated();
 }
 
 JNIEXPORT void JNICALL onSurfaceChanged(JNIEnv *env, jclass type, jint width, jint height){
-	
+	MyGLRenderContext::GetInstance()->onSurfaceChanged(width, height);
 }
 
 JNIEXPORT void JNICALL onDrawFrame(JNIEnv *env, jclass type){
-	
+	 MyGLRenderContext::GetInstance()->onDrawFrame();
 }
 
 #ifdef _cplusplus
