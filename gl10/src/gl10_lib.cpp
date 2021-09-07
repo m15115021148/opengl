@@ -115,7 +115,7 @@ void renderFrame() {
  
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// 清除屏幕及深度缓存
     glLoadIdentity();					// 重置模型观察矩阵
-    glTranslatef(0.0f,0.0f, -6.0f);				// 移入屏幕 6.0
+    glTranslatef(0.0f,0.0f, -8.0f);				// 移入屏幕 6.0
  
     glRotatef(rtri,0.0f,1.0f,0.0f);				// 绕Y轴旋转金字塔
  
@@ -127,7 +127,7 @@ void renderFrame() {
     glDrawArrays(GL_TRIANGLES, 0, 12);
  
  
-	rtri += 0.2f;						// 增加三角形的旋转变量
+	rtri += 1.1f;						// 增加三角形的旋转变量
 	//LOGI("xxxxx");
  
 	glDisableClientState(GL_VERTEX_ARRAY);
