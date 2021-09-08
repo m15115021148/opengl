@@ -6,6 +6,7 @@
 #include "TriangleSample.h"
 #include "GLUtils.h"
 #include "imageDef.h"
+#include "TextureMapSample.h"
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
 
@@ -37,13 +38,14 @@ void MyGLRenderContext::setImageData(int format, int width, int height, uint8_t 
         default:
             break;
     }
-	//m_TextureMapSample->LoadImage(&nativeImage);
+	p_MapSample->loadImage(&nativeImage);
 }
 
 void MyGLRenderContext::onSurfaceCreated(){
 	LOGD("MyGLRenderContext::OnSurfaceCreated");
     glClearColor(1.0f,1.0f,1.0f, 1.0f);
-    p_Sample->init();
+    //p_Sample->init();
+	p_MapSample->init();
 }
 
 void MyGLRenderContext::onSurfaceChanged(int width, int height){
@@ -55,7 +57,8 @@ void MyGLRenderContext::onDrawFrame(){
 	//LOGD("MyGLRenderContext::OnDrawFrame");
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    p_Sample->draw();
+    //p_Sample->draw();
+	p_MapSample->draw();
 
 }
 

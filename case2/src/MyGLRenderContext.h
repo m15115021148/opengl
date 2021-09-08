@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "TriangleSample.h"
+#include "TextureMapSample.h"
 
 #ifndef _My_GL_RENDER_CONTEXT_H_
 #define _My_GL_RENDER_CONTEXT_H_
@@ -23,6 +24,7 @@ class MyGLRenderContext
 	private:
 		static MyGLRenderContext *m_pContext;
 		TriangleSample *p_Sample = new TriangleSample();
+		TextureMapSample *p_MapSample = new TextureMapSample();
 };
 
 #endif
