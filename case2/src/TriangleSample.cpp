@@ -35,7 +35,7 @@ void TriangleSample::init(){
 }
 
 void TriangleSample::draw(){
-	LOGD("TriangleSample::Draw");
+	//LOGD("TriangleSample::Draw");
     GLfloat vVertices[] = {
             0.0f,  0.5f, 0.0f,
             -0.5f, -0.5f, 0.0f,

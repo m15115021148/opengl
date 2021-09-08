@@ -42,7 +42,7 @@ void MyGLRenderContext::setImageData(int format, int width, int height, uint8_t 
 
 void MyGLRenderContext::onSurfaceCreated(){
 	LOGD("MyGLRenderContext::OnSurfaceCreated");
-    glClearColor(1.0f,1.0f,0.5f, 1.0f);
+    glClearColor(1.0f,1.0f,1.0f, 1.0f);
     p_Sample->init();
 }
 
@@ -52,7 +52,7 @@ void MyGLRenderContext::onSurfaceChanged(int width, int height){
 }
 
 void MyGLRenderContext::onDrawFrame(){
-	LOGD("MyGLRenderContext::OnDrawFrame");
+	//LOGD("MyGLRenderContext::OnDrawFrame");
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
     p_Sample->draw();
@@ -60,8 +60,8 @@ void MyGLRenderContext::onDrawFrame(){
 }
 
 MyGLRenderContext *MyGLRenderContext::GetInstance(){
-	LOGD("MyGLRenderContext::GetInstance");
 	if (m_pContext == nullptr) {
+		LOGD("MyGLRenderContext::GetInstance");
 		m_pContext = new MyGLRenderContext();
 	}
 	return m_pContext;
