@@ -55,6 +55,7 @@ set(third-party-libs
         avfilter
         swresample
         swscale
+		postproc
         avutil)
 
 set(yuv-libs

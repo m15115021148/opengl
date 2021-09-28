@@ -66,19 +66,24 @@ JNIEXPORT jint JNICALL playVideo(JNIEnv *env, jobject type, jstring url, jobject
 
 	char input_url[1024]={0};
 	sprintf(input_url,"%s", input);
+	LOGD("input_url %s",input_url);
 	
 	ANativeWindow* nativeWindow = ANativeWindow_fromSurface(env, surface);
-	if (0 == nativeWindow) {
+	/*if (nativeWindow == NULL) {
 		LOGE("init surface nativeWindow is null");
 		return -1;
-	}
+	}*/
 	
 	av_register_all();
 	
 	pFormatCtx = avformat_alloc_context();
 	
-	if (avformat_open_input(&pFormatCtx, input_url, NULL, NULL) != 0) {
-		LOGE("avformat_open_input fail.");
+	char buf[1024];
+	int err_code = avformat_open_input(&pFormatCtx, input_url, NULL, NULL);
+
+	if (err_code != 0) {
+		av_strerror(err_code, buf, 1024);
+		LOGE("avformat_open_input fail : %d(%s)", err_code, buf);
 		return -1;
 	}
 	
@@ -201,8 +206,8 @@ JNIEXPORT jint JNICALL playVideo(JNIEnv *env, jobject type, jstring url, jobject
 
 
 static JNINativeMethod g_RenderMethods[] = {
-	{"getFFmpegVersion",				"()Ljava/lang/String;",									(void *)(getFFmpegVersion)},
-	{"playVideo",						"(Ljava/lang/String;Ljava/lang/Object;)I",				(void *)(playVideo)},
+	{"getFFmpegVersion",				"()Ljava/lang/String;",										(void *)(getFFmpegVersion)},
+	{"playVideo",						"(Ljava/lang/String;Landroid/view/Surface;)I",				(void *)(playVideo)},
 };
 
 static int RegisterNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int methodNum){
