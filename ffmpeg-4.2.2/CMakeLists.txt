@@ -10,6 +10,7 @@ cmake_minimum_required(VERSION 3.4.1)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
 set(jnilibs ${CMAKE_SOURCE_DIR}/android)
+set(libyuv ${CMAKE_SOURCE_DIR}/libyuv)
 set(libname media-ffmpeg)
 
 include_directories(
@@ -19,6 +20,16 @@ include_directories(
 
 link_directories(
         ${jnilibs}/${ANDROID_ABI}/lib)
+
+# libyuv lib include	start
+include_directories(
+        include
+        ${libyuv}/include
+)
+
+link_directories(
+        ${libyuv}/${ANDROID_ABI})
+# libyuv lib include	end
 
 file(GLOB_RECURSE ALL_SOURCE "src/*.cpp" "src/*.h")
 
@@ -45,6 +56,10 @@ set(third-party-libs
         swresample
         swscale
         avutil)
+
+set(yuv-libs
+
+	yuv)
 
 set(native-libs
 
@@ -74,4 +89,5 @@ target_link_libraries( # Specifies the target library.
                        # included in the NDK.
                        ${log-lib}
                        ${third-party-libs}
+					   ${yuv-libs}
                        ${native-libs})
