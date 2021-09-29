@@ -134,7 +134,7 @@ JNIEXPORT jint JNICALL playVideo(JNIEnv *env, jobject type, jstring url, jobject
 	
 	AVFrame *yuv_frame = av_frame_alloc();
 	AVFrame *rgb_frame = av_frame_alloc();
-	
+
 	int got_picture, ret;
 	int frame_count = 0;
 
@@ -143,26 +143,30 @@ JNIEXPORT jint JNICALL playVideo(JNIEnv *env, jobject type, jstring url, jobject
 		LOGE("init surface nativeWindow is null");
 		return -1;
 	}
-	
+
 	result = ANativeWindow_setBuffersGeometry(
 					nativeWindow, 
 					pAVCodecContent->width, 
 					pAVCodecContent->height,
-					WINDOW_FORMAT_RGBA_8888
-				);
+					WINDOW_FORMAT_RGBA_8888);
 	if (result < 0) {
 		LOGE("Player Error : Can not set native window buffer");
 		return -1;
 	}
-	
+
 	ANativeWindow_Buffer window_buffer;
-	
+
 	/*
     int buffer_size = av_image_get_buffer_size(AV_PIX_FMT_RGBA, videoWidth, videoHeight, 1);
     uint8_t *out_buffer = (uint8_t *) av_malloc(buffer_size * sizeof(uint8_t));
     av_image_fill_arrays(rgb_frame->data, rgb_frame->linesize, out_buffer, AV_PIX_FMT_RGBA, videoWidth, videoHeight, 1);
-	*/
 	
+	struct SwsContext *m_swsContext = sws_getContext(
+		videoWidth, videoHeight, pAVCodecContent->pix_fmt,
+		videoWidth, videoHeight, AV_PIX_FMT_RGBA,
+		SWS_FAST_BILINEAR, NULL, NULL, NULL
+	);*/
+
 	while ( av_read_frame(pFormatCtx, packet) >= 0) {
 		if (packet->stream_index == videoIndex) {
 			ret = avcodec_decode_video2(pAVCodecContent, yuv_frame, &got_picture, packet);
@@ -170,12 +174,11 @@ JNIEXPORT jint JNICALL playVideo(JNIEnv *env, jobject type, jstring url, jobject
 				LOGE("decode failt , ret=%d", ret);
 				return -1;
 			}
-			
+
 			if (got_picture){
-				
-				
+
 				ANativeWindow_lock(nativeWindow, &window_buffer, NULL);
-							   
+
 				av_image_fill_arrays(
 								rgb_frame->data,
 								rgb_frame->linesize,
@@ -186,14 +189,15 @@ JNIEXPORT jint JNICALL playVideo(JNIEnv *env, jobject type, jstring url, jobject
 								1
 				);
 
-                //YUV格式的数据转换成RGBA 8888格式的数据, FFmpeg 也可以转换，但是存在问题，使用libyuv这个库实现
-                libyuv::I420ToARGB(yuv_frame->data[0], yuv_frame->linesize[0],
-                           yuv_frame->data[2], yuv_frame->linesize[2],
-                           yuv_frame->data[1], yuv_frame->linesize[1],
-                           rgb_frame->data[0], rgb_frame->linesize[0],
-                           pAVCodecContent->width, pAVCodecContent->height);
+                //YUV格式的数据转换成RGBA 8888格式的数据
+                libyuv::I420ToARGB(
+							yuv_frame->data[0], yuv_frame->linesize[0],
+							yuv_frame->data[2], yuv_frame->linesize[2],
+							yuv_frame->data[1], yuv_frame->linesize[1],
+							rgb_frame->data[0], rgb_frame->linesize[0],
+							pAVCodecContent->width, pAVCodecContent->height);
 
-                //3、unlock window
+                //unlock window
                 ANativeWindow_unlockAndPost(nativeWindow);
 
                 frame_count++;
@@ -201,16 +205,23 @@ JNIEXPORT jint JNICALL playVideo(JNIEnv *env, jobject type, jstring url, jobject
 			}
 		}
 		//释放资源
-        av_free_packet(packet);
+        av_packet_unref(packet);
 	}
 		
     av_frame_free(&rgb_frame);
     av_frame_free(&yuv_frame);
     av_packet_free(&packet);
-    ANativeWindow_release(nativeWindow);
+	packet = nullptr;
+    
     avcodec_close(pAVCodecContent);
-    avformat_close_input(&pFormatCtx);
+	avcodec_free_context(&pAVCodecContent);
+	pAVCodecContent = nullptr;
 	
+    avformat_close_input(&pFormatCtx);
+	avformat_free_context(pFormatCtx);
+	pFormatCtx = nullptr;
+	
+	ANativeWindow_release(nativeWindow);
     env->ReleaseStringUTFChars(url, input);
 	return 0;
 }
