@@ -68,12 +68,6 @@ JNIEXPORT jint JNICALL playVideo(JNIEnv *env, jobject type, jstring url, jobject
 	sprintf(input_url,"%s", input);
 	LOGD("input_url %s",input_url);
 	
-	ANativeWindow* nativeWindow = ANativeWindow_fromSurface(env, surface);
-	/*if (nativeWindow == NULL) {
-		LOGE("init surface nativeWindow is null");
-		return -1;
-	}*/
-	
 	av_register_all();
 	
 	pFormatCtx = avformat_alloc_context();
@@ -130,6 +124,10 @@ JNIEXPORT jint JNICALL playVideo(JNIEnv *env, jobject type, jstring url, jobject
     LOGD("视频时长：%lld", (pFormatCtx->duration) / (1000 * 1000));
     LOGD("视频的宽高：%d,%d", pAVCodecContent->width, pAVCodecContent->height);
     LOGD("解码器的名称：%s", pCodec->name);
+	
+	// 获取视频的宽高
+    int videoWidth = pAVCodecContent->width;
+    int videoHeight = pAVCodecContent->height;
 
 	//read data 
 	AVPacket *packet = (AVPacket *)av_malloc(sizeof(AVPacket));
@@ -139,10 +137,33 @@ JNIEXPORT jint JNICALL playVideo(JNIEnv *env, jobject type, jstring url, jobject
 	
 	int got_picture, ret;
 	int frame_count = 0;
+
+	ANativeWindow* nativeWindow = ANativeWindow_fromSurface(env, surface);
+	if (nativeWindow == NULL) {
+		LOGE("init surface nativeWindow is null");
+		return -1;
+	}
 	
-	ANativeWindow_Buffer out_buffer;
+	result = ANativeWindow_setBuffersGeometry(
+					nativeWindow, 
+					pAVCodecContent->width, 
+					pAVCodecContent->height,
+					WINDOW_FORMAT_RGBA_8888
+				);
+	if (result < 0) {
+		LOGE("Player Error : Can not set native window buffer");
+		return -1;
+	}
 	
-	while (av_read_frame(pFormatCtx, packet) >= 0) {
+	ANativeWindow_Buffer window_buffer;
+	
+	/*
+    int buffer_size = av_image_get_buffer_size(AV_PIX_FMT_RGBA, videoWidth, videoHeight, 1);
+    uint8_t *out_buffer = (uint8_t *) av_malloc(buffer_size * sizeof(uint8_t));
+    av_image_fill_arrays(rgb_frame->data, rgb_frame->linesize, out_buffer, AV_PIX_FMT_RGBA, videoWidth, videoHeight, 1);
+	*/
+	
+	while ( av_read_frame(pFormatCtx, packet) >= 0) {
 		if (packet->stream_index == videoIndex) {
 			ret = avcodec_decode_video2(pAVCodecContent, yuv_frame, &got_picture, packet);
 			if (ret < 0) {
@@ -151,30 +172,19 @@ JNIEXPORT jint JNICALL playVideo(JNIEnv *env, jobject type, jstring url, jobject
 			}
 			
 			if (got_picture){
-				ANativeWindow_setBuffersGeometry(
-					nativeWindow, 
-					pAVCodecContent->width, 
-					pAVCodecContent->height,
-					WINDOW_FORMAT_RGBA_8888
-				);
 				
-				ANativeWindow_lock(nativeWindow, &out_buffer, NULL);
 				
-				//设置属性，像素格式、宽高
-                //rgb_frame的缓冲区就是Window的缓冲区，同一个，解锁的时候就会进行绘制
-                /*avpicture_fill((AVPicture *) rgb_frame, out_buffer.bits, AV_PIX_FMT_RGBA,
-                               pAVCodecContent->width,
-                               pAVCodecContent->height);*/
+				ANativeWindow_lock(nativeWindow, &window_buffer, NULL);
 							   
-				/*av_image_fill_arrays(
-								rgb_frame->data[0],
-								rgb_frame->linesize[0],
-								reinterpret_cast<const uint8_t *>(&out_buffer.bits),
+				av_image_fill_arrays(
+								rgb_frame->data,
+								rgb_frame->linesize,
+								(uint8_t *) window_buffer.bits,
 								AV_PIX_FMT_RGBA,
 								pAVCodecContent->width,
 								pAVCodecContent->height,
 								1
-				);*/
+				);
 
                 //YUV格式的数据转换成RGBA 8888格式的数据, FFmpeg 也可以转换，但是存在问题，使用libyuv这个库实现
                 libyuv::I420ToARGB(yuv_frame->data[0], yuv_frame->linesize[0],
@@ -193,9 +203,14 @@ JNIEXPORT jint JNICALL playVideo(JNIEnv *env, jobject type, jstring url, jobject
 		//释放资源
         av_free_packet(packet);
 	}
-	av_frame_free(&yuv_frame);
+		
+    av_frame_free(&rgb_frame);
+    av_frame_free(&yuv_frame);
+    av_packet_free(&packet);
+    ANativeWindow_release(nativeWindow);
     avcodec_close(pAVCodecContent);
-    avformat_free_context(pFormatCtx);
+    avformat_close_input(&pFormatCtx);
+	
     env->ReleaseStringUTFChars(url, input);
 	return 0;
 }
